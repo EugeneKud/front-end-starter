@@ -37,7 +37,7 @@ gulp.task('html', () => {
 
 gulp.task('styles', () => {
     return gulp.src(path.scssSrc)
-        .pipe(sass())
+        .pipe(sass()).on('error', sass.logError)
         .pipe(cssNano())
         .pipe(gulp.dest(path.scssDest));
 });
