@@ -6,6 +6,9 @@ import htmlMin from 'gulp-htmlmin';
 import sass from 'gulp-sass';
 import cssNano from 'gulp-cssnano';
 import typescript from 'gulp-typescript';
+import browserSync from 'browser-sync';
+
+const reload = browserSync.reload;
 
 const dir = {
     src: 'src',
@@ -51,3 +54,14 @@ gulp.task('typescript', () => {
 gulp.task('clean', () => del.sync(['dist']));
 
 gulp.task('default', ['clean', 'html', 'styles', 'typescript']);
+
+gulp.task('serve', () => {
+    browserSync({
+        server: [dir.dest],
+        port: 3000
+    });
+
+    gulp.watch(path.htmlSrc, ['html', reload]);
+    gulp.watch(path.scssSrc, ['styles', reload]);
+    gulp.watch(path.tsSrc, ['typescript', reload]);
+});
