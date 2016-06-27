@@ -5,6 +5,7 @@ import del from 'del';
 import htmlMin from 'gulp-htmlmin';
 import sass from 'gulp-sass';
 import cssNano from 'gulp-cssnano';
+import typescript from 'gulp-typescript';
 
 const dir = {
     src: 'src',
@@ -15,7 +16,9 @@ const path = {
     htmlSrc: `${dir.src}/**/*.html`,
     htmlDest: `${dir.dest}`,
     scssSrc: `${dir.src}/scss/**/*.scss`,
-    scssDest: `${dir.dest}/css`
+    scssDest: `${dir.dest}/css`,
+    tsSrc: `${dir.src}/ts/**/*.ts`,
+    tsDest: `${dir.dest}/js`
 };
 
 gulp.task('html', () => {
@@ -36,6 +39,15 @@ gulp.task('styles', () => {
         .pipe(gulp.dest(path.scssDest));
 });
 
+gulp.task('typescript', () => {
+    return gulp.src(path.tsSrc)
+        .pipe(typescript({
+            noImplicitAny: true,
+            out: 'main.js'
+        }))
+        .pipe(gulp.dest(path.tsDest))
+});
+
 gulp.task('clean', () => del.sync(['dist']));
 
-gulp.task('default', ['clean', 'html', 'styles']);
+gulp.task('default', ['clean', 'html', 'styles', 'typescript']);
