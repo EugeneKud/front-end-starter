@@ -7,6 +7,8 @@ import sass from 'gulp-sass';
 import cssNano from 'gulp-cssnano';
 import typescript from 'gulp-typescript';
 import browserSync from 'browser-sync';
+import merge from 'merge2';
+import concat from 'gulp-concat';
 
 const reload = browserSync.reload;
 
@@ -36,9 +38,17 @@ gulp.task('html', () => {
 });
 
 gulp.task('styles', () => {
-    return gulp.src(path.scssSrc)
-        .pipe(sass()).on('error', sass.logError)
-        .pipe(cssNano())
+    return merge(
+        gulp.src(path.scssSrc)
+            .pipe(sass()).on('error', sass.logError),
+        gulp.src('node_modules/normalize.css/normalize.css')
+    )
+        .pipe(concat('main.css'))
+        .pipe(cssNano({
+            discardComments: {
+                removeAll: true
+            }
+        }))
         .pipe(gulp.dest(path.scssDest));
 });
 
