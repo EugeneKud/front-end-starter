@@ -1,0 +1,6 @@
+{% extends "layout.nunjucks" %}
+
+{% block content %}
+    {{ nav.active('portfolio') }}
+    <h1>Portfolio</h1>
+{% endblock %}

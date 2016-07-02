@@ -1,5 +1,6 @@
-{% extends "layout.nunjucks" %}
+{% extends 'layout.nunjucks' %}
 
 {% block content %}
-<h1>This is the title of index.html</h1>
+    {{ nav.active('home') }}
+    <h1>Index</h1>
 {% endblock %}

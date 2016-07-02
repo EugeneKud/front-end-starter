@@ -1,10 +1,10 @@
 class Greeter {
     constructor(public greeting: string) { }
     greet() {
-        return "<h1>" + this.greeting + "</h1>";
+        return this.greeting;
     }
 }
 
-var greeter = new Greeter("Hello, world!");
+var greeter = new Greeter('TypeScript works!');
 
-document.body.innerHTML = greeter.greet();
+console.log(greeter.greet());

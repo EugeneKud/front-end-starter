@@ -1,15 +1,16 @@
 <!DOCTYPE html>
+<!--suppress HtmlUnknownTarget -->
 <html lang="">
 <head>
     <meta charset="UTF-8">
     <title>Front End Starter</title>
-    <!--suppress HtmlUnknownTarget -->
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
+    {% import 'macros/navigation.nunjucks' as nav %}
+
     {% block content %} {% endblock %}
 
-    <!--suppress HtmlUnknownTarget -->
     <script src="js/main.js"></script>
 </body>
 </html>
