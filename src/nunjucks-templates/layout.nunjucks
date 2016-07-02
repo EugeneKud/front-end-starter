@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-    <h1>Front End Starter</h1>
+    {% block content %} {% endblock %}
 
     <!--suppress HtmlUnknownTarget -->
     <script src="js/main.js"></script>

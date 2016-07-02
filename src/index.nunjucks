@@ -1,0 +1,5 @@
+{% extends "layout.nunjucks" %}
+
+{% block content %}
+<h1>This is the title of index.html</h1>
+{% endblock %}

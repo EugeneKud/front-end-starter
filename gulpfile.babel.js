@@ -2,76 +2,91 @@
 
 import gulp from 'gulp';
 import del from 'del';
-import htmlMin from 'gulp-htmlmin';
-import sass from 'gulp-sass';
-import cssNano from 'gulp-cssnano';
-import typescript from 'gulp-typescript';
+import gulpHtmlMin from 'gulp-htmlmin';
+import gulpSass from 'gulp-sass';
+import gulpCssNano from 'gulp-cssnano';
+import gulpTypescript from 'gulp-typescript';
 import browserSync from 'browser-sync';
-import merge from 'merge2';
-import concat from 'gulp-concat';
+import merge2 from 'merge2';
+import gulpConcat from 'gulp-concat';
+import gulpNunjucksRender from 'gulp-nunjucks-render';
 
-const reload = browserSync.reload;
+const BROWSER_SYNC_RELOAD = browserSync.reload;
 
-const dir = {
-    src: 'src',
-    dest: 'dist'
+const PROJECT = {
+    SRC: 'src',
+    DEST: 'dist'
 };
 
-const path = {
-    htmlSrc: `${dir.src}/**/*.html`,
-    htmlDest: `${dir.dest}`,
-    scssSrc: `${dir.src}/scss/**/*.scss`,
-    scssDest: `${dir.dest}/css`,
-    tsSrc: `${dir.src}/ts/**/*.ts`,
-    tsDest: `${dir.dest}/js`
+const PATH = {
+    HTML_SRC: `${PROJECT.SRC}/**/*.html`,
+    HTML_DEST: `${PROJECT.DEST}`,
+    SCSS_SRC: `${PROJECT.SRC}/scss/**/*.scss`,
+    SCSS_DEST: `${PROJECT.DEST}/css`,
+    TS_SRC: `${PROJECT.SRC}/ts/**/*.ts`,
+    TS_DEST: `${PROJECT.DEST}/js`,
+    NUNJUCKS_SRC: `${PROJECT.SRC}/**/*.nunjucks`,
+    NUNJUCKS_DEST: `${PROJECT.DEST}`,
+    NUNJUCKS_TEMPLATES: `${PROJECT.SRC}/nunjucks-templates`
 };
 
 gulp.task('html', () => {
-    return gulp.src(path.htmlSrc)
-        .pipe(htmlMin({
+    return merge2(
+        gulp.src([PATH.NUNJUCKS_SRC, `!${PATH.NUNJUCKS_TEMPLATES}/**/*.nunjucks`])
+            .pipe(gulpNunjucksRender({
+                path: [PATH.NUNJUCKS_TEMPLATES]
+            })),
+        gulp.src(PATH.HTML_SRC) // regular HTML files
+    )
+        .pipe(gulpHtmlMin({
             collapseWhitespace: true, // most important, remove unnecessary spaces and line breaks
             removeRedundantAttributes: true,
             removeEmptyAttributes: true, // <html lang=""> gets removed
             removeComments: true
         }))
-        .pipe(gulp.dest(path.htmlDest)); // output files
+        .pipe(gulp.dest(PATH.HTML_DEST)); // output files
 });
 
 gulp.task('styles', () => {
-    return merge(
-        gulp.src(path.scssSrc)
-            .pipe(sass()).on('error', sass.logError),
+    return merge2(
+        gulp.src(PATH.SCSS_SRC)
+            .pipe(gulpSass()).on('error', gulpSass.logError),
         gulp.src('node_modules/normalize.css/normalize.css')
     )
-        .pipe(concat('main.css'))
-        .pipe(cssNano({
+        .pipe(gulpConcat('main.css'))
+        .pipe(gulpCssNano({
             discardComments: {
                 removeAll: true
             }
         }))
-        .pipe(gulp.dest(path.scssDest));
+        .pipe(gulp.dest(PATH.SCSS_DEST));
 });
 
 gulp.task('typescript', () => {
-    return gulp.src(path.tsSrc)
-        .pipe(typescript({
+    return gulp.src(PATH.TS_SRC)
+        .pipe(gulpTypescript({
             noImplicitAny: true,
             out: 'main.js'
         }))
-        .pipe(gulp.dest(path.tsDest))
+        .pipe(gulp.dest(PATH.TS_DEST))
 });
 
-gulp.task('clean', () => del.sync(['dist']));
-
-gulp.task('default', ['clean', 'html', 'styles', 'typescript']);
-
-gulp.task('serve', () => {
+gulp.task('serve', ['build'], () => {
     browserSync({
-        server: [dir.dest],
+        server: [PROJECT.DEST],
         port: 3000
     });
-
-    gulp.watch(path.htmlSrc, ['html', reload]);
-    gulp.watch(path.scssSrc, ['styles', reload]);
-    gulp.watch(path.tsSrc, ['typescript', reload]);
+    gulp.watch([PATH.HTML_SRC, PATH.NUNJUCKS_SRC], ['html', BROWSER_SYNC_RELOAD]);
+    gulp.watch(PATH.SCSS_SRC, ['styles', BROWSER_SYNC_RELOAD]);
+    gulp.watch(PATH.TS_SRC, ['typescript', BROWSER_SYNC_RELOAD]);
 });
+
+gulp.task('clean', () =>
+    del.sync([PROJECT.DEST])
+);
+
+gulp.task('build', ['clean', 'html', 'styles', 'typescript']);
+
+gulp.task('default',
+    ['build']
+);
